@@ -21,13 +21,13 @@ export class ProfesorEntity{
     @Column()
     DatumRodjenja:string;
     @Column()
-    JMBG;
+    JMBG:string;
     @Column()
     RadniStaz:number;
     @Column()
-    ImeRoditelja;
+    ImeRoditelja:string;
     @Column()
-    ProsecnaOcena;
+    ProsecnaOcena:number;
     ListaKomentara?:Komentar[];
     /*@ManyToOne(()=>AdministratorEntity, administrator=>administrator.Profesori)
     Administrator?:AdministratorEntity;

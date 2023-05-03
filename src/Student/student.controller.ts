@@ -6,11 +6,14 @@ import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { error } from "console";
 import {compare} from 'bcryptjs'
+import { AdministratorEntity } from "src/Administrator/administrator.entity";
 @Controller('student')
 export class StudentController{
     
     constructor(@InjectRepository(StudentEntity)
-    private readonly repo:Repository<StudentEntity>){}
+    private readonly repo:Repository<StudentEntity>,
+    @InjectRepository(AdministratorEntity)
+        private readonly adminRepo: Repository<AdministratorEntity>){}
 
     @Get('vratiSve')
     async vratiSveStudente()
@@ -28,10 +31,17 @@ export class StudentController{
         console.log("los unos");
         return error;
         }
+        const admin=await this.adminRepo.findOne({where:{Id:1}});
+        if(!admin){
+            console.log("nema ga admin");
+            return null;
+        }
         const hashPass=await bcrypt.hash(student.Password,10);
         student.Password=hashPass;
+        student.Administrator=admin;
         await this.repo.save(student);
-       
+        admin.Studenti.push(student);
+        await this.adminRepo.save(admin);
         return {
             status:'success',
             message:'student je uspesno dodat'

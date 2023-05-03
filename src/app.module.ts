@@ -11,6 +11,8 @@ import { PredmetEntity } from './Predmet/predmet.entity';
 import { PredmetModule } from './Predmet/predmet.module';
 import { SmerEntity } from './Smer/smer.entity';
 import { SmerModule } from './Smer/smer.module';
+import { AdministratorEntity } from './Administrator/administrator.entity';
+import { AdministratorModule } from './Administrator/administrator.module';
 @Module({
   imports: [ConfigModule.forRoot({isGlobal:true}),
     TypeOrmModule.forRoot({
@@ -21,10 +23,10 @@ import { SmerModule } from './Smer/smer.module';
       password:null,
       database:'primer5',
       autoLoadEntities:true,
-      entities:[StudentEntity,ProfesorEntity,PredmetEntity,SmerEntity],
+      entities:[StudentEntity,ProfesorEntity,PredmetEntity,SmerEntity,AdministratorEntity],
       synchronize:true,
     }),
-    StudentModule,ProfesorModule,PredmetModule,SmerModule],
+    StudentModule,ProfesorModule,PredmetModule,SmerModule,AdministratorModule],
   controllers: [AppController],
   providers: [AppService],
 })
