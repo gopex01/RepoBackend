@@ -6,11 +6,14 @@ import * as jwt from 'jsonwebtoken';
 import {compare} from 'bcryptjs'
 import {error} from "console";
 import { InjectRepository } from "@nestjs/typeorm";
+import { AdministratorEntity } from "src/Administrator/administrator.entity";
 @Controller('profesor')
 export class ProfesorController{
 
     constructor(@InjectRepository(ProfesorEntity)
-        private readonly repoProfesor:Repository<ProfesorEntity>){}
+        private readonly repoProfesor:Repository<ProfesorEntity>,
+        @InjectRepository(AdministratorEntity)
+        private readonly adminRepo:Repository<AdministratorEntity>){}
 
     @Get()
     async vratiSveProfesore(){
@@ -24,9 +27,24 @@ export class ProfesorController{
             console.log("Los unos");
             return error;
         }
+        const admin=await this.adminRepo.findOne({where:{Id:1}});
+        if(!admin)
+        {
+            console.log("ne postoji admin");
+            return null;
+        }
         const hashPass=await bcrypt.hash(profesor.Password,10);
         profesor.Password=hashPass;
+        profesor.TrenutniBrojOcena=0;
+        profesor.ProsecnaOcena=0;
+        profesor.Administrator=admin;
         await this.repoProfesor.save(profesor);
+        if(admin.Profesori===undefined)
+        {
+            admin.Profesori=[];
+        }
+        admin.Profesori.push(profesor);
+        await this.adminRepo.save(admin);
         return {
             status:'success',
             message:'Profesor je uspesno dodat'
@@ -51,5 +69,15 @@ export class ProfesorController{
             profesor,
             token
         };
+    }
+    @Get('vratiSvePredmete/:jmbg')
+    async vratiSvePredmete(@Param('jmbg')jmbg:string){
+        const profesor=await this.repoProfesor.findOneOrFail({where:{JMBG:jmbg}});
+        if(!profesor){
+            console.log("ne postoji profeosr");
+            return null;
+        }
+        const predmeti=await profesor.Predmeti;
+        return predmeti;
     }
 }

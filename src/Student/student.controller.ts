@@ -1,4 +1,4 @@
-import { Controller, Get,Post,Body,Param, NotFoundException } from "@nestjs/common";
+import { Controller, Get,Post,Body,Param, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm"
 import { StudentEntity } from "./student.entity";
 import { Repository } from "typeorm";
@@ -37,9 +37,13 @@ export class StudentController{
             return null;
         }
         const hashPass=await bcrypt.hash(student.Password,10);
+        student.TrenutniBrojOcena=0;
+        student.Prosek=0;
         student.Password=hashPass;
         student.Administrator=admin;
         await this.repo.save(student);
+        if(admin.Studenti===undefined)
+            admin.Studenti=[];
         admin.Studenti.push(student);
         await this.adminRepo.save(admin);
         return {

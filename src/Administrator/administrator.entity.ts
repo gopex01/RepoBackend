@@ -1,6 +1,5 @@
 import { PredmetEntity } from "src/Predmet/predmet.entity";
 import { ProfesorEntity } from "src/Profesor/profesor.entity";
-import { SmerEntity } from "src/Smer/smer.entity";
 import { StudentEntity } from "src/Student/student.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -12,12 +11,18 @@ export class AdministratorEntity{
     Username:string;
     @Column()
     Password:string;
-    @OneToMany(()=>StudentEntity, student=>student.Administrator)
+    @OneToMany(()=>StudentEntity, student=>student.Administrator,{
+        eager:true
+    })
     Studenti?:StudentEntity[];
-   /* @OneToMany(()=>ProfesorEntity, profesor=>profesor.Administrator)
+    @OneToMany(()=>ProfesorEntity, profesor=>profesor.Administrator,{
+        eager:true
+    })
     Profesori?:ProfesorEntity[];
-    @OneToMany(()=>PredmetEntity,predmet=>predmet.Administrator)
+    
+    @OneToMany(()=>PredmetEntity,predmet=>predmet.Administrator,{
+        eager:true
+    })
     Predmeti?:PredmetEntity[];
-    @OneToMany(()=>SmerEntity,smer=>smer.Administrator)
-    Smerovi?:SmerEntity[];*/
+    
 }

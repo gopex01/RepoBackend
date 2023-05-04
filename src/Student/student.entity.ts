@@ -29,9 +29,10 @@ export class StudentEntity{
     @Column()
     JMBG:string;
     @Column()
-    smer:string;
+    Smer:string;
+    TrenutniBrojOcena?:number;
     @ManyToOne(()=>AdministratorEntity, administrator=>administrator.Studenti)
     Administrator?:AdministratorEntity;
     
     
-}
+ }

@@ -9,8 +9,6 @@ import { ProfesorEntity } from './Profesor/profesor.entity';
 import { ProfesorModule } from './Profesor/profesor.module';
 import { PredmetEntity } from './Predmet/predmet.entity';
 import { PredmetModule } from './Predmet/predmet.module';
-import { SmerEntity } from './Smer/smer.entity';
-import { SmerModule } from './Smer/smer.module';
 import { AdministratorEntity } from './Administrator/administrator.entity';
 import { AdministratorModule } from './Administrator/administrator.module';
 @Module({
@@ -23,10 +21,10 @@ import { AdministratorModule } from './Administrator/administrator.module';
       password:null,
       database:'primer5',
       autoLoadEntities:true,
-      entities:[StudentEntity,ProfesorEntity,PredmetEntity,SmerEntity,AdministratorEntity],
+      entities:[StudentEntity,ProfesorEntity,PredmetEntity,AdministratorEntity],
       synchronize:true,
     }),
-    StudentModule,ProfesorModule,PredmetModule,SmerModule,AdministratorModule],
+    StudentModule,ProfesorModule,PredmetModule,AdministratorModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -27,10 +27,13 @@ export class ProfesorEntity{
     @Column()
     ImeRoditelja:string;
     @Column()
-    ProsecnaOcena:number;
+    ProsecnaOcena?:number;
+    TrenutniBrojOcena?:number;
     ListaKomentara?:Komentar[];
-    /*@ManyToOne(()=>AdministratorEntity, administrator=>administrator.Profesori)
+    @ManyToOne(()=>AdministratorEntity, administrator=>administrator.Profesori)
     Administrator?:AdministratorEntity;
-    @OneToMany(()=>PredmetEntity,predmet=>predmet.Profesor)
-    Predmeti?:PredmetEntity[];*/
+    @OneToMany(()=>PredmetEntity,predmet=>predmet.Profesor,{
+        eager:true
+    })
+    Predmeti?:PredmetEntity[];
 }

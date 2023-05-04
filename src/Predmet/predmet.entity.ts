@@ -17,8 +17,8 @@ export class PredmetEntity{
     Godina:number;
     @Column()
     Opis:string;
-   /* @ManyToOne(()=>AdministratorEntity,administarotor=>administarotor.Predmeti)
-    Administrator?:AdministratorEntity;
+   @ManyToOne(()=>AdministratorEntity,administarotor=>administarotor.Predmeti)
+    Administrator?:AdministratorEntity; 
     @ManyToOne(()=>ProfesorEntity,profesor=>profesor.Predmeti)
-    Profesor?:ProfesorEntity;*/
+    Profesor?:ProfesorEntity;
 }
