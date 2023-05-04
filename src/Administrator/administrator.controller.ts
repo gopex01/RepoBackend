@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AdministratorEntity } from "./administrator.entity";
 import { Repository } from "typeorm";
@@ -8,6 +8,7 @@ import * as jwt from 'jsonwebtoken';
 import {compare} from 'bcryptjs'
 import { PredmetEntity } from "src/Predmet/predmet.entity";
 import { ProfesorEntity } from "src/Profesor/profesor.entity";
+import { VerifikacioniKodEntity } from "src/VerfikacioniKod/verifikacioni.kod.entity";
 @Controller('administrator')
 export class AdministratorController{
     
@@ -16,7 +17,9 @@ export class AdministratorController{
     @InjectRepository(PredmetEntity)
     private readonly predmetRepo:Repository<PredmetEntity>,
     @InjectRepository(ProfesorEntity)
-    private readonly profesorRepo:Repository<ProfesorEntity>){}
+    private readonly profesorRepo:Repository<ProfesorEntity>,
+    @InjectRepository(VerifikacioniKodEntity)
+    private readonly verifikacioniKodRepo:Repository<VerifikacioniKodEntity>){}
 
     @Post()
     async dodajAdministratora(@Body()input:AdministratorEntity){
@@ -119,6 +122,36 @@ export class AdministratorController{
     @Post('dodajPredmetStudentu/:nazivPredmeta/:brojIndexa')
     async dodajPredmetStudentu(@Param('nazivPredmeta') nazivP:string,@Param('brojIndexa')brojIndexa:number){
         
+    }
+    @Post('dodajVerifikacioniKod')
+    async dodajKod(@Body()input:VerifikacioniKodEntity){
+        const kod={...input};
+        kod.VerifikacioniKod=Math.floor(Math.random()*9000000)+1000000;
+        await this.verifikacioniKodRepo.save(kod);
+    }
+    // async dodajKod(){
+    //     const admin=await this.adminRepo.findOneOrFail({where:{Id:1}});
+    //     if(admin.ListaVerifKodova===undefined)
+    //     {
+    //         admin.ListaVerifKodova=[];
+    //     }
+    //     admin.ListaVerifKodova.push(Math.floor(Math.random() * 9000000) + 1000000);
+    //     await this.adminRepo.save(admin);
+    // }
+    // @Post('dodajBrojKartice')
+    // async dodajBrojKartice(){
+    //     const admin=await this.adminRepo.findOneOrFail({where:{Id:1}});
+    //     if(admin.ListaBrKartica===undefined)
+    //     {
+    //         admin.ListaBrKartica=[];
+    //         console.log("broj kartice postavljen na defined");
+    //     }
+    //     admin.ListaBrKartica.push(Math.floor(Math.random() * 900000000) + 100000000);
+    //     await this.adminRepo.save(admin);
+    // }
+    @Get('vratiBrojeveKartica')
+     async vratiBrojeveKartica(){
+         return await this.verifikacioniKodRepo.find();
     }
     
 }

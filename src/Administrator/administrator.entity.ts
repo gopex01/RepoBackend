@@ -25,4 +25,8 @@ export class AdministratorEntity{
     })
     Predmeti?:PredmetEntity[];
     
+    ListaVerifKodova?:number[];
+   
+    ListaBrKartica?:number[];
+    
 }

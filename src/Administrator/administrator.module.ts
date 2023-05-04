@@ -6,10 +6,11 @@ import { PredmetEntity } from "src/Predmet/predmet.entity";
 import { PredmetModule } from "src/Predmet/predmet.module";
 import { ProfesorEntity } from "src/Profesor/profesor.entity";
 import { ProfesorModule } from "src/Profesor/profesor.module";
+import { VerifikacioniKodEntity } from "src/VerfikacioniKod/verifikacioni.kod.entity";
 
 @Module({
     imports:[TypeOrmModule.forFeature([AdministratorEntity]),TypeOrmModule.forFeature([PredmetEntity]),PredmetModule,
-TypeOrmModule.forFeature([ProfesorEntity])],
+TypeOrmModule.forFeature([ProfesorEntity]),TypeOrmModule.forFeature([VerifikacioniKodEntity])],
     controllers:[AdministratorController],
     providers:[]
 })

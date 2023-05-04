@@ -33,7 +33,18 @@ export class ProfesorController{
             console.log("ne postoji admin");
             return null;
         }
-        const hashPass=await bcrypt.hash(profesor.Password,10);
+        let flag:Boolean=false;
+        let p:number;
+        admin.ListaBrKartica.forEach((x,i)=>{
+            if(x===profesor.IdBrojKartice)
+            {
+                flag=true;
+                p=i;
+            }
+        })
+        if(flag===true){
+            admin.ListaBrKartica.splice(p,1);
+            const hashPass=await bcrypt.hash(profesor.Password,10);
         profesor.Password=hashPass;
         profesor.TrenutniBrojOcena=0;
         profesor.ProsecnaOcena=0;
@@ -49,6 +60,11 @@ export class ProfesorController{
             status:'success',
             message:'Profesor je uspesno dodat'
         }
+    }
+    else{
+        console.log("Nedozvoljena registracija");
+        return null;
+    }
     }
     @Get('loginProfesor/:user/:pass')
     async login(@Param('user') user:string ,@Param('pass') pass:string){
