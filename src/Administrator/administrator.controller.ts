@@ -116,5 +116,9 @@ export class AdministratorController{
         const predmeti=await admin.Predmeti;
         return predmeti;
     }
+    @Post('dodajPredmetStudentu/:nazivPredmeta/:brojIndexa')
+    async dodajPredmetStudentu(@Param('nazivPredmeta') nazivP:string,@Param('brojIndexa')brojIndexa:number){
+        
+    }
     
 }
