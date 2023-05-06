@@ -6,12 +6,14 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { AdministratorModule } from 'src/Administrator/administrator.module';
 import { AdministratorEntity } from 'src/Administrator/administrator.entity';
 import { VerifikacioniKodEntity } from 'src/VerfikacioniKod/verifikacioni.kod.entity';
+import { IspitEntity } from 'src/Ispit/ispit.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([StudentEntity]),
     TypeOrmModule.forFeature([AdministratorEntity]),
     TypeOrmModule.forFeature([VerifikacioniKodEntity]),
+    TypeOrmModule.forFeature([IspitEntity]),
   ],
   controllers: [StudentController],
   providers: [],

@@ -16,15 +16,18 @@ import { error } from 'console';
 import { compare } from 'bcryptjs';
 import { AdministratorEntity } from 'src/Administrator/administrator.entity';
 import { VerifikacioniKodEntity } from 'src/VerfikacioniKod/verifikacioni.kod.entity';
+import { IspitEntity } from 'src/Ispit/ispit.entity';
 @Controller('student')
 export class StudentController {
   constructor(
     @InjectRepository(StudentEntity)
     private readonly repo: Repository<StudentEntity>,
     @InjectRepository(AdministratorEntity)
-    private readonly adminRepo: Repository<AdministratorEntity>,
+    private readonly adminRepository: Repository<AdministratorEntity>,
     @InjectRepository(VerifikacioniKodEntity)
     private readonly kodRepository: Repository<VerifikacioniKodEntity>,
+    @InjectRepository(IspitEntity)
+    private readonly ispitRepository: Repository<IspitEntity>,
   ) {}
 
   @Get('vratiSve')
@@ -40,7 +43,7 @@ export class StudentController {
       console.log('los unos');
       return error;
     }
-    const admin = await this.adminRepo.findOne({ where: { Id: 1 } });
+    const admin = await this.adminRepository.findOne({ where: { Id: 1 } });
     if (!admin) {
       console.log('nema ga admin');
       return null;
@@ -57,7 +60,7 @@ export class StudentController {
       await this.repo.save(student);
       if (admin.Studenti === undefined) admin.Studenti = [];
       admin.Studenti.push(student);
-      await this.adminRepo.save(admin);
+      await this.adminRepository.save(admin);
       await this.kodRepository.delete(verifikacioni);
       return {
         status: 'success',
@@ -69,7 +72,7 @@ export class StudentController {
   }
   @Get('loginStudent/:user/:pass')
   async login(@Param('user') user: string, @Param('pass') pass: string) {
-    const student = await this.repo.findOneOrFail({ where: { Email: user } });
+    const student = await this.repo.findOne({ where: { Email: user } });
     if (!student) return null;
     const isPasswordValid = await compare(pass, student.Password);
     if (!isPasswordValid) return null;
@@ -79,4 +82,101 @@ export class StudentController {
     console.log(student);
     return { student, token };
   }
+  @Get('esbpUGodini/:indeks/:godina')
+  async esbpUGodini(
+    @Param('indeks') indeks: number,
+    @Param('godina') godina: number,
+  ) {
+    const student = await this.repo.findOne({ where: { BrojIndexa: indeks } });
+    let suma: number = student.Ispiti.filter(
+      ((p) => p.Polozen === true) && ((p) => p.Godina === godina),
+    ).reduce((acc: number, ispit: IspitEntity) => {
+      return acc + ispit.ESPB;
+    }, 0);
+  }
+
+  @Get('polozeniIspitiURoku/:indeks/:godina/:rok')
+  async polozeniIspitiURoku(
+    @Param('indeks') indeks: number,
+    @Param('godina') godina: number,
+    @Param('rok') rok: string,
+  ) {
+    const student = await this.repo.findOne({ where: { BrojIndexa: indeks } });
+    const listaIspita = student.Ispiti.filter(
+      (p) => p.Godina === godina && p.Rok === rok && p.Polozen === true,
+    );
+    return listaIspita;
+  }
+
+  @Get('prijavljeniIspitiURoku/:indeks/:godina/:rok')
+  async prijavljeniIspitiURoku(
+    @Param('indeks') indeks: number,
+    @Param('godina') godina: number,
+    @Param('rok') rok: string,
+  ) {
+    const student = await this.repo.findOne({ where: { BrojIndexa: indeks } });
+    const listaIspita = student.Ispiti.filter(
+      (p) => p.Godina === godina && p.Rok === rok && p.Prijavljen === true,
+    );
+    return listaIspita;
+  }
+  @Post('prijaviIspit/:indeks/:naziv/:godina/:rok/:espb')
+  async prijaviIspit(
+    @Param('indeks') indeks: number,
+    @Param('naziv') naziv: string,
+    @Param('godina') godina: number,
+    @Param('rok') rok: string,
+    @Param('espb') espb: number,
+  ) {
+    const student = await this.repo.findOne({ where: { BrojIndexa: indeks } });
+    if (!student) return null;
+    let postojeciIspit = await this.ispitRepository.findOne({
+      where: { Naziv: naziv },
+    });
+    if (
+      postojeciIspit !== null &&
+      postojeciIspit !== undefined &&
+      postojeciIspit.Polozen === true
+    ) {
+      return ' Student je vec polozio ovaj ispit';
+    }
+    if (postojeciIspit === null || postojeciIspit === undefined) {
+      //nikad nije polagao ispit
+      let ispit: IspitEntity = new IspitEntity();
+      ispit.Naziv = naziv;
+      ispit.Godina = godina;
+      ispit.Rok = rok;
+      ispit.ESPB = espb;
+      ispit.Prijavljen = true;
+      this.ispitRepository.save(ispit);
+      student.Ispiti.push(ispit);
+      return ' student je uspesno prijavio ovaj ispit po prvi put';
+    }
+    if (
+      postojeciIspit !== null &&
+      postojeciIspit !== undefined &&
+      postojeciIspit.Prijavljen === true
+    ) {
+      return ' student je vec prijavio ovaj ispit';
+    }
+    if (
+      postojeciIspit !== null &&
+      postojeciIspit !== undefined &&
+      postojeciIspit.Prijavljen === false
+    ) {
+      //vec polagao ispit ali ga nije polozio
+      postojeciIspit.Godina = godina;
+      postojeciIspit.Rok = rok;
+      postojeciIspit.Prijavljen = true;
+      this.ispitRepository.save(postojeciIspit);
+    }
+  }
+  @Post('poloziIspit/:indeks/:naziv/godina/:rok/:ocena')
+  async poloziIspit(
+    @Param('indeks') indeks: number,
+    @Param('naziv') naziv: string,
+    @Param('godina') godina: number,
+    @Param('rok') rok: string,
+    @Param('ocena') ocena: number,
+  ) {}
 }
