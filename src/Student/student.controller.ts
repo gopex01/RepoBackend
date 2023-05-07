@@ -131,7 +131,24 @@ export class StudentController {
     );
     return listaIspita;
   }
-  @Post('prijaviIspit/:indeks/:naziv/:godina/:rok/:espb')
+  @Post('prijaviIspit/:id/:naziv/:rok')
+  async prijaviIspit(@Param('id')id:number,@Param('naziv') naziv:string,@Param('rok')rok:string)
+  {
+      const student:StudentEntity=await this.repo.findOneOrFail({where:{Id:id}});
+      if(!student){
+        console.log("ne postoji takav student");
+      }
+     student.Ispiti.forEach(async x=>{
+      if(x.Naziv===naziv){
+        let ispit=await this.ispitRepository.findOneOrFail({where:{Naziv:naziv}});
+        ispit.Rok=rok;
+        ispit.Prijavljen=true;
+        await this.ispitRepository.save(ispit);
+      }
+     })
+
+  }
+ /* @Post('prijaviIspit/:indeks/:naziv/:godina/:rok/:espb')
   async prijaviIspit(
     @Param('indeks') indeks: number,
     @Param('naziv') naziv: string,
@@ -181,7 +198,7 @@ export class StudentController {
       postojeciIspit.Prijavljen = true;
       this.ispitRepository.save(postojeciIspit);
     }
-  }
+  }*/
   @Post('poloziIspit/:indeks/:naziv/godina/:rok/:ocena')
   async poloziIspit(
     @Param('indeks') indeks: number,
