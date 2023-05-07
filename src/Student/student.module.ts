@@ -7,6 +7,8 @@ import { AdministratorModule } from 'src/Administrator/administrator.module';
 import { AdministratorEntity } from 'src/Administrator/administrator.entity';
 import { VerifikacioniKodEntity } from 'src/VerfikacioniKod/verifikacioni.kod.entity';
 import { IspitEntity } from 'src/Ispit/ispit.entity';
+import { ProfesorEntity } from 'src/Profesor/profesor.entity';
+import { KomentarEntity } from 'src/Komentar/komentar.entity';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { IspitEntity } from 'src/Ispit/ispit.entity';
     TypeOrmModule.forFeature([AdministratorEntity]),
     TypeOrmModule.forFeature([VerifikacioniKodEntity]),
     TypeOrmModule.forFeature([IspitEntity]),
+    TypeOrmModule.forFeature([ProfesorEntity]),
+    TypeOrmModule.forFeature([KomentarEntity])
   ],
   controllers: [StudentController],
   providers: [],

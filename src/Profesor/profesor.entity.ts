@@ -5,10 +5,9 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Komentar } from './komentar';
 import { AdministratorEntity } from 'src/Administrator/administrator.entity';
 import { PredmetEntity } from 'src/Predmet/predmet.entity';
-
+import { KomentarEntity } from 'src/Komentar/komentar.entity';
 @Entity('Profesor', { name: 'Profesor' })
 export class ProfesorEntity {
   @PrimaryGeneratedColumn()
@@ -34,7 +33,11 @@ export class ProfesorEntity {
   @Column()
   ProsecnaOcena?: number;
   TrenutniBrojOcena?: number;
-  ListaKomentara?: Komentar[];
+  @OneToMany(()=>KomentarEntity,(komentar)=>komentar.Profesor,{
+    eager:true
+  })
+  Komentari?:KomentarEntity[];
+  ListaKomentara?: KomentarEntity[];
   @ManyToOne(
     () => AdministratorEntity,
     (administrator) => administrator.Profesori,

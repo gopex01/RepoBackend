@@ -17,6 +17,11 @@ import { compare } from 'bcryptjs';
 import { AdministratorEntity } from 'src/Administrator/administrator.entity';
 import { VerifikacioniKodEntity } from 'src/VerfikacioniKod/verifikacioni.kod.entity';
 import { IspitEntity } from 'src/Ispit/ispit.entity';
+import { ProfesorEntity } from 'src/Profesor/profesor.entity';
+import { checkPrimeSync, privateDecrypt } from 'crypto';
+import { KomentarEntity } from 'src/Komentar/komentar.entity';
+import { ok } from 'assert';
+import { stringify } from 'querystring';
 @Controller('student')
 export class StudentController {
   constructor(
@@ -28,6 +33,10 @@ export class StudentController {
     private readonly kodRepository: Repository<VerifikacioniKodEntity>,
     @InjectRepository(IspitEntity)
     private readonly ispitRepository: Repository<IspitEntity>,
+    @InjectRepository(ProfesorEntity)
+    private readonly profesorRepo:Repository<ProfesorEntity>,
+    @InjectRepository(KomentarEntity)
+    private readonly repoKomentar:Repository<KomentarEntity>
   ) {}
 
   @Get('vratiSve')
@@ -148,63 +157,56 @@ export class StudentController {
      })
 
   }
- /* @Post('prijaviIspit/:indeks/:naziv/:godina/:rok/:espb')
-  async prijaviIspit(
-    @Param('indeks') indeks: number,
-    @Param('naziv') naziv: string,
-    @Param('godina') godina: number,
-    @Param('rok') rok: string,
-    @Param('espb') espb: number,
-  ) {
-    const student = await this.repo.findOne({ where: { BrojIndexa: indeks } });
-    if (!student) return null;
-    let postojeciIspit = await this.ispitRepository.findOne({
-      where: { Naziv: naziv },
-    });
-    if (
-      postojeciIspit !== null &&
-      postojeciIspit !== undefined &&
-      postojeciIspit.Polozen === true
-    ) {
-      return ' Student je vec polozio ovaj ispit';
+  @Post('dodajKomentar/:idProfesora/:ocena/:komentar')
+  async dodajKomentar(@Body()input:KomentarEntity,@Param('idProfesora')idProfesora:number,@Param('ocena')ocena:number,@Param('komentar')Komentarulaz:string)
+  {
+    const profesor=await this.profesorRepo.findOneOrFail({where:{Id:idProfesora}});
+    if(!profesor)
+    {
+      console.log("nepostojeci profesor");
+      return null;
     }
-    if (postojeciIspit === null || postojeciIspit === undefined) {
-      //nikad nije polagao ispit
-      let ispit: IspitEntity = new IspitEntity();
-      ispit.Naziv = naziv;
-      ispit.Godina = godina;
-      ispit.Rok = rok;
-      ispit.ESPB = espb;
-      ispit.Prijavljen = true;
-      this.ispitRepository.save(ispit);
-      student.Ispiti.push(ispit);
-      return ' student je uspesno prijavio ovaj ispit po prvi put';
+    if(profesor.ListaKomentara===undefined || profesor.ListaKomentara===null)
+    {
+      profesor.ListaKomentara=[];
     }
-    if (
-      postojeciIspit !== null &&
-      postojeciIspit !== undefined &&
-      postojeciIspit.Prijavljen === true
-    ) {
-      return ' student je vec prijavio ovaj ispit';
+    let komentar={...input};
+    komentar.Komentar=Komentarulaz;
+    komentar.Ocena=ocena;
+    console.log(profesor);
+    komentar.Profesor=profesor;
+    await this.repoKomentar.save(komentar);
+    profesor.Komentari.push(komentar);
+    await this.profesorRepo.save(profesor);
+    return ok;
+    
+  }
+  @Get('vidiKomentare/:id')
+  async vidiKomentare(@Param('id')id:number){
+    const profesor=await this.profesorRepo.findOneOrFail({where:{Id:id}});
+    if(!profesor)
+    {
+      console.log("ne postoji takakv profesor");
+      return null;
     }
-    if (
-      postojeciIspit !== null &&
-      postojeciIspit !== undefined &&
-      postojeciIspit.Prijavljen === false
-    ) {
-      //vec polagao ispit ali ga nije polozio
-      postojeciIspit.Godina = godina;
-      postojeciIspit.Rok = rok;
-      postojeciIspit.Prijavljen = true;
-      this.ispitRepository.save(postojeciIspit);
+    return profesor.Komentari;
+  }
+  @Get('vidiInfoProfesora/:id')
+  async vidiInfoProfesora(@Param('id')id:number){
+    const profesor:ProfesorEntity=await this.profesorRepo.findOneOrFail({where:{Id:id}});
+    if(!profesor)
+    {
+      console.log("ne postoji takav profesor");
+      return null;
     }
-  }*/
-  @Post('poloziIspit/:indeks/:naziv/godina/:rok/:ocena')
-  async poloziIspit(
-    @Param('indeks') indeks: number,
-    @Param('naziv') naziv: string,
-    @Param('godina') godina: number,
-    @Param('rok') rok: string,
-    @Param('ocena') ocena: number,
-  ) {}
+    let br_ocena=0;
+    let sum_ocena=0;
+    profesor.Komentari.forEach(x=>{
+      br_ocena++;
+      sum_ocena+=x.Ocena;
+    })
+    profesor.TrenutniBrojOcena=br_ocena;
+    profesor.ProsecnaOcena=sum_ocena/br_ocena;
+    return profesor;
+  }
 }
