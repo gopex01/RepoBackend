@@ -117,7 +117,7 @@ export class StudentController {
     return listaIspita;
   }
 
-  @Get('vratiSveIspite/:Id')
+  @Get('vratiSveIspite/:Id')//ovo ce bude isto i za prikaz svih predmeta ce se dogovorimo samo sta ce da vraca funkcija
   async vratiSveIspite(@Param('id')id:number)
   {
      const student=await this.repo.findOne({where:{Id:id}});
