@@ -14,17 +14,17 @@ export class IspitEntity {
   @Column()
   Naziv: string;
   @Column()
-  Ocena: number = 0; //da moze da prijavi ispit bez ocene
+  Ocena?: number; //da moze da prijavi ispit bez ocene
   @Column()
-  Rok: string;
+  Rok?: string;
   @Column()
   Godina: number;
   @Column()
   ESPB: number;
   @Column()
-  Prijavljen: boolean = false;
+  Prijavljen: boolean;
   @Column()
-  Polozen: boolean = false;
+  Polozen: boolean;
   @ManyToOne(() => StudentEntity, (student) => student.Ispiti)
   Student?: StudentEntity; //? da li treba nullable
 }

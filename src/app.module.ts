@@ -19,7 +19,7 @@ import { AdministratorModule } from './Administrator/administrator.module';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'puflander',
+      password: null,
       database: 'primer5',
       autoLoadEntities: true,
       entities: [

@@ -108,6 +108,17 @@ export class StudentController {
     return listaIspita;
   }
 
+  @Get('vratiSveIspite/:Id')
+  async vratiSveIspite(@Param('id')id:number)
+  {
+     const student=await this.repo.findOne({where:{Id:id}});
+     if(!student)
+     {
+      console.log("error nema ga");
+     }
+     console.log(student.Ispiti);
+     return student.Ispiti;
+  }
   @Get('prijavljeniIspitiURoku/:indeks/:godina/:rok')
   async prijavljeniIspitiURoku(
     @Param('indeks') indeks: number,

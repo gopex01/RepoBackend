@@ -10,6 +10,8 @@ import { PredmetEntity } from 'src/Predmet/predmet.entity';
 import { ProfesorEntity } from 'src/Profesor/profesor.entity';
 import { VerifikacioniKodEntity } from 'src/VerfikacioniKod/verifikacioni.kod.entity';
 import { BrojKarticeEntity } from 'src/BrojKartice/broj.kartice.entity';
+import { IspitEntity } from 'src/Ispit/ispit.entity';
+import { StudentEntity } from 'src/Student/student.entity';
 @Controller('administrator')
 export class AdministratorController {
   constructor(
@@ -23,6 +25,10 @@ export class AdministratorController {
     private readonly verifikacioniKodRepo: Repository<VerifikacioniKodEntity>,
     @InjectRepository(BrojKarticeEntity)
     private readonly BrojKarticeRepo: Repository<BrojKarticeEntity>,
+    @InjectRepository(StudentEntity)
+    private readonly studentRepo:Repository<StudentEntity>,
+    @InjectRepository(IspitEntity)
+    private readonly ispitRepo:Repository<IspitEntity>
   ) {}
 
   @Post()
@@ -153,5 +159,40 @@ export class AdministratorController {
   @Get('vratiVerifikacioneKodove')
   async vratiVerifikacioneKodove() {
     return await this.verifikacioniKodRepo.find();
+  }
+  @Post('dodeliIspiteStudentima')
+  async dodeliIspiteStudentima()
+  {
+      const admin=await this.adminRepo.findOne({ where: { Id: 1 } });
+      
+      admin.Studenti.forEach(async x=>{
+        let student=await this.studentRepo.findOne({where:{Id:x.Id}})
+        admin.Predmeti.forEach(async y=>{
+          if(y.Godina===x.TrenutnaGodinaStudija)
+          {
+            let flag:boolean=true;
+            for(let p=0;p<student.Ispiti.length;p++){
+              if(y.Naziv===student.Ispiti[p].Naziv){
+              flag=false;
+              console.log("nadjen isti");
+              }
+            }
+            if(flag===true){
+            let i:IspitEntity=new IspitEntity();
+            i.Naziv=y.Naziv;
+            i.Godina=y.Godina;
+            i.ESPB=y.ESPB;
+            i.Ocena=5;
+            i.Rok="Januarski";
+            i.Prijavljen=false;
+            i.Polozen=false;
+            await this.ispitRepo.save(i);
+            i.Student=student;
+            student.Ispiti.push(i);
+            await this.studentRepo.save(student);
+            }
+          }
+        })
+      })
   }
 }
